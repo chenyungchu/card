@@ -2,391 +2,1549 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>李彥勳 ∙ 悅懌生技顧問</title>
-<meta name="description" content="創新配方設計 ∙ 市場需求規劃 ∙ 品牌孵化陪跑">
-<meta property="og:title" content="李彥勳 ∙ 總經理 ∙ 悅懌生技顧問">
-<meta property="og:description" content="創新配方設計 ∙ 市場需求規劃 ∙ 品牌孵化陪跑">
-<meta property="og:image" content="card-flex.jpg">
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINE 電子名片產生器</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
-    --brand:      #ffad01;
-    --brand-deep: #d98f00;
-    --brand-soft: #fff6e2;
-    --ink:        #1b1a18;
-    --ink-2:      #4b4945;
-    --ink-3:      #8d8a84;
-    --paper:      #ffffff;
-    --paper-2:    #faf8f4;
-    --rule:       #e9e4da;
+    --bg:#f3f1ec; --panel:#fffdfa; --edge:#e0dace; --ink:#2b2824; --dim:#7f7a70;
+    --brand:#7d9a74; --warn:#b4793f;
     --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,system-ui,sans-serif;
-    --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
-  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html{ scroll-behavior:smooth; }
-  body{
-    margin:0; background:#e6e2da; color:var(--ink);
-    font-family:var(--font); line-height:1.8; -webkit-font-smoothing:antialiased;
-  }
-  .shell{
-    position:relative; max-width:520px; margin:0 auto; min-height:100vh;
-    background:var(--paper); padding-bottom:88px;
-    box-shadow:0 0 70px -24px rgba(40,34,24,.4); overflow:hidden;
-  }
-  .progress{
-    position:fixed; top:0; left:50%; transform:translateX(-50%);
-    width:100%; max-width:520px; height:3px; z-index:40; pointer-events:none;
-  }
-  .progress i{ display:block; height:100%; width:0; background:var(--brand); transition:width .1s linear; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:var(--font); background:var(--bg); color:var(--ink); line-height:1.7; }
 
-  /* ═════ 首屏 ═════ */
-  .hero{ position:relative; height:min(70vh,580px); overflow:hidden; background:#4a4e55; }
-  .hero img{
-    position:absolute; inset:0; width:100%; height:100%;
-    object-fit:cover; object-position:50% 12%; display:block;
+  header.top{
+    background:var(--panel); border-bottom:1px solid var(--edge);
+    padding:22px 24px; text-align:center;
   }
-  .hero .veil{
-    position:absolute; inset:0;
-    background:linear-gradient(to bottom,
-      rgba(14,15,17,0) 32%, rgba(14,15,17,.22) 54%,
-      rgba(14,15,17,.76) 84%, rgba(14,15,17,.94) 100%);
+  header.top{ position:relative; }
+  header.top h1{ margin:0; font-size:21px; letter-spacing:.06em; }
+  #btnReset{
+    position:absolute; right:20px; top:50%; transform:translateY(-50%);
+    font-family:inherit; font-size:12px; letter-spacing:.04em; cursor:pointer;
+    border:1px solid var(--edge); background:#fff; color:var(--dim);
+    border-radius:9px; padding:8px 13px;
   }
-  .hero .bar{
-    position:absolute; left:24px; bottom:0; width:3px; height:42%;
-    background:linear-gradient(to bottom, rgba(255,173,1,0), var(--brand));
+  #btnReset:hover{ color:var(--ink); border-color:var(--dim); }
+  @media (max-width:560px){
+    #btnReset{ position:static; transform:none; margin-top:12px; }
   }
-  .hero .meta{ position:absolute; left:0; right:0; bottom:0; padding:0 24px 30px 40px; }
-  .hero .title{
-    display:inline-block; margin:0 0 12px; padding:4px 12px;
-    font-size:11.5px; letter-spacing:.2em; color:#1b1a18; font-weight:700;
-    background:var(--brand); border-radius:2px;
-  }
-  .hero h1{
-    margin:0; font-size:40px; font-weight:700; letter-spacing:.14em; line-height:1.15;
-    color:#fff; text-shadow:0 2px 18px rgba(0,0,0,.5);
-  }
-  .hero .en{
-    margin:9px 0 0; font-family:var(--mono); font-size:10.5px;
-    letter-spacing:.32em; text-transform:uppercase; color:rgba(255,255,255,.66);
-  }
-  .hero .corp{
-    margin:16px 0 0; font-size:13px; letter-spacing:.05em; color:rgba(255,255,255,.9);
-  }
-  .hero .corp span{ display:block; font-size:12px; color:rgba(255,255,255,.62); margin-top:2px; }
+  header.top p{ margin:6px 0 0; font-size:13px; color:var(--dim); }
 
-  /* ═════ 品牌帶 ═════ */
-  .brandband{ background:var(--brand); padding:26px 24px 24px; text-align:center; }
-  .brandband img{ width:min(260px,72%); height:auto; display:block; margin:0 auto; mix-blend-mode:normal; }
-  .brandband ul{
-    list-style:none; margin:20px 0 0; padding:0;
-    display:flex; justify-content:center; flex-wrap:wrap; gap:8px 0;
-  }
-  .brandband li{
-    font-size:12.5px; letter-spacing:.08em; color:#4a3300; font-weight:600;
-    padding:0 14px; position:relative;
-  }
-  .brandband li + li::before{
-    content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
-    width:1px; height:12px; background:rgba(74,51,0,.35);
-  }
+  .layout{ max-width:1180px; margin:0 auto; padding:24px; display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:24px; align-items:start; }
+  @media (max-width:980px){ .layout{ grid-template-columns:1fr; } .preview{ position:static !important; } }
 
-  /* ═════ 分節 ═════ */
-  main{ padding:0 24px; }
-  section{ padding:32px 0; border-bottom:1px solid var(--rule); }
-  section:last-of-type{ border-bottom:0; }
-  .head{ display:flex; align-items:baseline; gap:11px; margin-bottom:20px; }
-  .head .no{ font-family:var(--mono); font-size:11px; letter-spacing:.1em; color:var(--brand-deep); }
-  .head h2{ margin:0; font-size:16px; font-weight:700; letter-spacing:.14em; }
-  .head .en{
-    margin-left:auto; font-family:var(--mono); font-size:9.5px;
-    letter-spacing:.22em; color:var(--ink-3); text-transform:uppercase;
+  .card{ background:var(--panel); border:1px solid var(--edge); border-radius:16px; padding:22px; margin-bottom:18px; }
+  .card h2{
+    margin:0 0 4px; font-size:12px; font-weight:700; letter-spacing:.18em;
+    color:var(--brand); text-transform:uppercase;
+    display:flex; align-items:center; gap:10px;
   }
+  .card h2::after{ content:""; flex:1; height:1px; background:var(--edge); }
+  .card .hint{ margin:0 0 16px; font-size:12.5px; color:var(--dim); }
 
-  /* 服務 */
-  .svc{ list-style:none; margin:0; padding:0; }
-  .svc li{
-    display:flex; gap:15px; padding:15px 0; border-top:1px solid var(--rule);
+  label{ display:block; font-size:13px; font-weight:600; margin:14px 0 5px; }
+  label .opt{ font-weight:400; color:var(--dim); font-size:11.5px; }
+  input[type=text], input[type=url], input[type=email], input[type=tel], textarea, select{
+    width:100%; font-family:inherit; font-size:14px; color:var(--ink);
+    padding:10px 12px; border:1px solid var(--edge); border-radius:10px;
+    background:#fff; outline:none;
   }
-  .svc li:first-child{ border-top:0; padding-top:0; }
-  .svc .n{
-    font-family:var(--mono); font-size:11px; color:var(--brand-deep);
-    padding-top:4px; min-width:22px;
-  }
-  .svc b{ display:block; font-size:15px; font-weight:600; letter-spacing:.05em; }
-  .svc span{ display:block; font-size:13px; color:var(--ink-2); line-height:1.85; margin-top:3px; }
+  input:focus, textarea:focus, select:focus{ border-color:var(--brand); box-shadow:0 0 0 3px rgba(125,154,116,.16); }
+  textarea{ resize:vertical; min-height:88px; line-height:1.8; }
+  .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:520px){ .row{ grid-template-columns:1fr; } }
+  .sub{ font-size:11.5px; color:var(--dim); margin-top:5px; }
 
-  /* 據點 */
-  .sites{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .sites li{
-    background:var(--paper-2); border:1px solid var(--rule); border-radius:3px;
-    padding:11px 13px; font-size:13px; letter-spacing:.04em;
-  }
-  .sites li.hq{ background:var(--brand-soft); border-color:#f3dba6; grid-column:1 / -1; }
-  .sites li .tag{
-    display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.16em;
-    color:var(--brand-deep); text-transform:uppercase; margin-bottom:1px;
-  }
+  .swatches{ display:flex; gap:9px; flex-wrap:wrap; margin-top:6px; }
+  .sw{ width:36px; height:36px; border-radius:10px; border:2px solid transparent; cursor:pointer; outline:1px solid var(--edge); }
+  .sw[aria-pressed="true"]{ border-color:var(--ink); }
 
-  /* 聯絡 */
-  .rows{ list-style:none; margin:0; padding:0; }
-  .rows li + li{ margin-top:8px; }
-  .rows a, .rows .row{
-    display:flex; align-items:center; gap:14px; padding:13px 15px;
-    text-decoration:none; color:var(--ink);
-    background:var(--paper-2); border:1px solid var(--rule); border-radius:3px;
-    transition:border-color .2s, transform .12s;
+  .drop{
+    border:2px dashed var(--edge); border-radius:14px; padding:26px 16px; text-align:center;
+    cursor:pointer; background:#fff; transition:border-color .2s, background .2s;
   }
-  .rows a:active{ transform:translateY(1px); border-color:var(--brand); }
-  .rows .ic{
-    width:34px; height:34px; flex:none; border-radius:3px; display:grid; place-items:center;
-    background:var(--brand); color:#fff;
-  }
-  .rows .ic.line{ background:#06c755; }
-  .rows .ic svg{ width:18px; height:18px; }
-  .rows .t{ flex:1; min-width:0; }
-  .rows .t b{
-    display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.18em;
-    color:var(--ink-3); text-transform:uppercase; font-weight:500;
-  }
-  .rows .t span{ display:block; font-size:14px; letter-spacing:.02em; word-break:break-all; }
-  .rows .arw{ width:14px; height:14px; color:var(--ink-3); flex:none; }
+  .drop:hover, .drop.over{ border-color:var(--brand); background:#f7faf6; }
+  .drop b{ display:block; font-size:14px; }
+  .drop span{ font-size:12px; color:var(--dim); }
+  input[type=file]{ display:none; }
 
-  /* 公司資訊 */
-  .info{ font-size:13px; color:var(--ink-2); }
-  .info dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:9px 16px; }
-  .info dt{
-    font-family:var(--mono); font-size:9.5px; letter-spacing:.16em;
-    color:var(--ink-3); text-transform:uppercase; padding-top:4px;
-  }
-  .info dd{ margin:0; letter-spacing:.03em; }
-  .info a{ color:var(--brand-deep); }
+  .slider-row{ display:flex; align-items:center; gap:12px; margin-top:12px; }
+  .slider-row span{ font-size:12px; color:var(--dim); white-space:nowrap; }
+  input[type=range]{ flex:1; accent-color:var(--brand); }
 
-  .colophon{
-    padding:28px 0 32px; text-align:center;
-    font-family:var(--mono); font-size:9.5px; letter-spacing:.26em; color:var(--ink-3);
+  .toggle{ display:flex; gap:10px; margin-top:8px; }
+  .toggle button{
+    flex:1; font-family:inherit; font-size:12.5px; cursor:pointer;
+    padding:10px 8px; border-radius:10px; border:1px solid var(--edge); background:#fff; color:var(--ink);
   }
+  .toggle button[aria-pressed="true"]{ background:var(--brand); color:#fff; border-color:transparent; font-weight:600; }
 
-  /* ═════ 底部固定列 ═════ */
-  .dock{
-    position:fixed; left:50%; transform:translateX(-50%); bottom:0; z-index:30;
-    width:100%; max-width:520px;
-    padding:11px 20px; padding-bottom:max(11px,env(safe-area-inset-bottom));
-    background:rgba(255,255,255,.92); backdrop-filter:blur(16px);
-    border-top:1px solid var(--rule); display:flex; gap:8px;
+  .note{
+    font-size:12.5px; color:#6d5636; background:#fdf6ea; border:1px solid #ecdcc0;
+    border-radius:10px; padding:11px 13px; margin-top:12px;
   }
-  .dock a, .dock button{
-    flex:1; appearance:none; font-family:inherit; cursor:pointer; text-decoration:none;
-    border:1px solid var(--rule); background:var(--paper-2); color:var(--ink);
-    border-radius:3px; padding:12px 6px; font-size:12.5px; letter-spacing:.04em;
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    transition:transform .12s;
+  .note b{ color:#5a441f; }
+
+  /* 預覽欄 */
+  .preview{ position:sticky; top:24px; }
+  .phone{
+    width:100%; max-width:360px; margin:0 auto; aspect-ratio:9/17;
+    border:9px solid #23201c; border-radius:30px; overflow:hidden; background:#fff;
+    box-shadow:0 20px 44px -22px rgba(0,0,0,.6);
   }
-  .dock a:active, .dock button:active{ transform:translateY(1px); }
-  .dock svg{ width:15px; height:15px; }
-  .dock .line{ background:#06c755; color:#fff; border-color:transparent; font-weight:600; }
-  .dock [hidden]{ display:none !important; }
-
-  .toast{
-    position:fixed; left:50%; bottom:86px; transform:translate(-50%,14px);
-    background:var(--ink); color:#fff; font-size:12.5px;
-    padding:10px 18px; border-radius:3px; opacity:0; pointer-events:none;
-    transition:opacity .25s, transform .25s; z-index:40;
+  .phone iframe{ width:100%; height:100%; border:0; display:block; }
+  .tabs{ display:flex; gap:8px; margin-bottom:14px; }
+  .tabs button{
+    flex:1; font-family:inherit; font-size:12.5px; cursor:pointer; padding:9px;
+    border-radius:10px; border:1px solid var(--edge); background:var(--panel); color:var(--ink);
   }
-  .toast.show{ opacity:1; transform:translate(-50%,0); }
+  .tabs button[aria-pressed="true"]{ background:var(--ink); color:#fff; border-color:transparent; font-weight:600; }
+  #cardWrap{ text-align:center; }
+  #cardPreview{ width:100%; max-width:360px; height:auto; border-radius:14px; box-shadow:0 20px 44px -22px rgba(0,0,0,.5); }
 
-  .rise{ opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s ease; }
-  .rise.in{ opacity:1; transform:none; }
-  @media (prefers-reduced-motion:reduce){ .rise{ opacity:1; transform:none; transition:none; } }
+  .btn{
+    width:100%; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;
+    padding:15px; border-radius:13px; border:1px solid var(--edge);
+    background:var(--panel); color:var(--ink); margin-top:10px;
+  }
+  .btn.primary{ background:var(--brand); color:#fff; border-color:transparent; }
+  .btn:disabled{ opacity:.5; cursor:default; }
+  .status{ font-size:12.5px; color:var(--dim); text-align:center; min-height:1.5em; margin-top:8px; }
 
-  .hero.bare{ height:auto; background:transparent; padding:58px 0 0; }
-  .hero.bare img, .hero.bare .veil, .hero.bare .bar{ display:none; }
-  .hero.bare .meta{ position:static; padding:0 24px; }
-  .hero.bare h1{ color:var(--ink); text-shadow:none; }
-  .hero.bare .en{ color:var(--ink-3); }
-  .hero.bare .corp{ color:var(--ink-2); }
-  .hero.bare .corp span{ color:var(--ink-3); }
+  details.way{
+    border:1px solid var(--edge); border-radius:12px; background:#fff;
+    padding:0 14px; margin-top:10px;
+  }
+  details.way[open]{ padding-bottom:14px; }
+  details.way summary{
+    list-style:none; cursor:pointer; padding:13px 0;
+    font-size:13.5px; font-weight:600; letter-spacing:.02em;
+    display:flex; align-items:center; gap:9px;
+  }
+  details.way summary::-webkit-details-marker{ display:none; }
+  details.way summary::before{
+    content:"▸"; color:var(--brand); font-size:12px; transition:transform .18s;
+  }
+  details.way[open] summary::before{ transform:rotate(90deg); }
+  details.way summary .tagline{ margin-left:auto; font-size:11.5px; font-weight:400; color:var(--dim); }
+  .compare{ width:100%; border-collapse:collapse; font-size:12.5px; margin:4px 0 2px; }
+  .compare th, .compare td{ border-bottom:1px solid var(--edge); padding:7px 4px; text-align:left; vertical-align:top; }
+  .compare th{ color:var(--dim); font-weight:600; font-size:11.5px; }
+  ol.steps{ margin:0; padding-left:20px; font-size:13.5px; }
+  ol.steps li{ margin-bottom:14px; }
+  ol.steps code{
+    font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px;
+    background:#f1efe9; border:1px solid var(--edge); border-radius:5px; padding:1px 6px; word-break:break-all;
+  }
+  ol.steps a{ color:#4a6f43; }
+  .kv{ width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
+  .kv td{ border-bottom:1px solid var(--edge); padding:8px 4px; vertical-align:top; }
+  .kv td:first-child{ color:var(--dim); white-space:nowrap; padding-right:14px; }
+  footer{ text-align:center; font-size:11.5px; color:var(--dim); padding:10px 24px 40px; }
 </style>
 </head>
 <body>
 
-<div class="progress"><i id="bar"></i></div>
+<header class="top">
+  <h1>LINE 電子名片產生器</h1>
+  <p>填表單 → 下載 → 拖曳上線。不用寫任何程式碼。</p>
+  <button id="btnReset">清空重填</button>
+</header>
+
+<div class="layout">
+
+  <!-- ══════════ 左欄：表單 ══════════ -->
+  <div>
+
+    <div class="note" id="demoBar" hidden>
+      <b>右邊顯示的是範例。</b>表單已經先填好一組假資料，讓你看得到成品長什麼樣——
+      直接把每一格改成你自己的就好，預覽會即時跟著變。
+    </div>
+
+
+    <div class="card">
+      <h2>1 · 基本資料</h2>
+      <p class="hint">會顯示在名片圖和網站最上方。</p>
+
+      <div class="row">
+        <div>
+          <label>姓名</label>
+          <input type="text" id="f_name" placeholder="陳詠筑" maxlength="12">
+        </div>
+        <div>
+          <label>英文名 <span class="opt">選填</span></label>
+          <input type="text" id="f_nameEn" placeholder="Rita Chen" maxlength="30">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>職稱</label>
+          <input type="text" id="f_role" placeholder="AI 應用師" maxlength="20">
+        </div>
+        <div>
+          <label>單位 / 公司 <span class="opt">選填</span></label>
+          <input type="text" id="f_org" placeholder="國立中央大學 醫學工程研究所" maxlength="30">
+        </div>
+      </div>
+
+      <label>一句標語 <span class="opt">建議 20 字內，可用「，」斷行</span></label>
+      <input type="text" id="f_tagline" placeholder="把模型接進資料，把資料變成答案。" maxlength="40">
+
+      <label>主色</label>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="card">
+      <h2>2 · 形象照</h2>
+      <p class="hint">會自動裁成直幅 3:4 並壓縮。建議用正面、背景單純的照片。</p>
+
+      <div class="drop" id="drop">
+        <b>點這裡選照片</b>
+        <span>或把檔案拖進來 · JPG / PNG</span>
+      </div>
+      <input type="file" id="file" accept="image/*">
+
+      <label>名片版型</label>
+      <div class="toggle" id="layoutMode">
+        <button data-v="frame" aria-pressed="true">框式</button>
+        <button data-v="soft" aria-pressed="false">滿版 · 低調</button>
+        <button data-v="full" aria-pressed="false">滿版 · 強烈</button>
+      </div>
+      <p class="sub">
+        <b>框式</b>：米白底 + 照片放在圓角框裡。適合去背照、大頭照。<br>
+        <b>滿版 · 低調</b>：文字不搶戲，讓照片主導。適合<b>本身已經有設計感</b>的照片，例如雜誌風、情境照。<br>
+        <b>滿版 · 強烈</b>：職稱做成主色標籤壓在姓名上方，層級分明。適合一般半身照、證件照。<br>
+        兩種滿版都會自動改用直式比例 2:3。
+      </p>
+
+      <div class="note" id="fullTip" hidden>
+        <b>滿版提醒：</b>照片下半部會被漸層蓋住放文字，請挑<b>人物位於畫面偏上</b>的照片。
+        人站太低的話臉會被文字壓到——先拉「裁切位置」滑桿往左試試，還是不行就換一張。
+      </div>
+
+      <div id="cropCtl" hidden>
+        <div class="slider-row">
+          <span>裁切位置</span>
+          <input type="range" id="focal" min="0" max="100" value="30">
+          <span id="focalVal">30%</span>
+        </div>
+        <p class="sub">往左＝保留較多頭頂，往右＝保留較多肩膀。調到臉在畫面中上方最好看。</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3 · 自我介紹</h2>
+      <p class="hint">空一行就會分段。建議 100～200 字。</p>
+      <textarea id="f_bio" placeholder="在中央大學醫學工程研究所，把語言模型接到真正要用的地方……"></textarea>
+
+      <label>專長標籤 <span class="opt">用逗號分隔，建議 3～6 個</span></label>
+      <input type="text" id="f_tags" placeholder="AI 問答機器人, 語言模型應用, 統計數據分析">
+    </div>
+
+    <div class="card">
+      <h2>4 · 經歷 <span style="font-weight:400;letter-spacing:0;color:var(--dim);text-transform:none;font-size:11px">選填</span></h2>
+      <p class="hint">過去的職位、學歷、合作過的對象，或你提供的服務。留空就不會出現這個區塊。</p>
+
+      <label>區塊標題</label>
+      <input type="text" id="f_expTitle" placeholder="經歷" maxlength="10">
+      <p class="sub">例如：經歷、過去經驗、業務發展、服務項目、合作客戶。</p>
+
+      <label>內容 <span class="opt">一行一項</span></label>
+      <textarea id="f_exp" placeholder="前日用品公司 高級總監｜2018–2024
+前醫檢集團 董事長特助
+輔仁大學 資訊管理學系｜學歷"></textarea>
+      <p class="sub">想加小字說明的話，用全形的「<b>｜</b>」分隔：<code style="font-family:ui-monospace,monospace;font-size:11px">主要內容｜右側小字</code>。不加也可以。</p>
+    </div>
+
+    <div class="card">
+      <h2>5 · 連結</h2>
+      <p class="hint">留空的不會出現。</p>
+
+      <div class="row">
+        <div>
+          <label>Instagram 帳號 <span class="opt">不用加 @</span></label>
+          <input type="text" id="f_ig" placeholder="rita29ood">
+        </div>
+        <div>
+          <label>Facebook 網址</label>
+          <input type="url" id="f_fb" placeholder="https://www.facebook.com/...">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>YouTube 網址</label>
+          <input type="url" id="f_yt" placeholder="https://www.youtube.com/@...">
+        </div>
+        <div>
+          <label>YouTube 頻道名 <span class="opt">選填</span></label>
+          <input type="text" id="f_ytName" placeholder="冬瓜檸檬">
+        </div>
+      </div>
+      <label>個人網站 <span class="opt">選填</span></label>
+      <input type="url" id="f_site" placeholder="https://...">
+    </div>
+
+    <div class="card">
+      <h2>6 · 聯絡方式</h2>
+      <p class="hint">兩種都會寫進「存聯絡人」檔案，差別只在網頁上看不看得到。</p>
+
+      <div class="row">
+        <div>
+          <label>Email</label>
+          <input type="email" id="f_email" placeholder="you@example.com">
+        </div>
+        <div>
+          <label>手機</label>
+          <input type="tel" id="f_phone" placeholder="0912345678">
+        </div>
+      </div>
+
+      <label>要不要顯示在網頁上？</label>
+      <div class="toggle" id="contactMode">
+        <button data-v="hide" aria-pressed="true">不顯示（防爬蟲）</button>
+        <button data-v="show" aria-pressed="false">直接顯示</button>
+      </div>
+      <p class="sub">網站是公開的。選「直接顯示」等於把號碼貼在網路上，垃圾訊息會變多。選「不顯示」的話，對方要按「存聯絡人」才拿得到。</p>
+    </div>
+
+    <div class="card">
+      <h2>7 · LIFF ID</h2>
+      <p class="hint">先留空沒關係。網站上線後再回來填，重新下載一次即可。</p>
+      <input type="text" id="f_liff" placeholder="2011841020-xONie09p">
+      <p class="sub">填了之後，在 LINE 裡開啟時會多出「分享名片給好友」按鈕。沒填的話網站其他功能完全正常。</p>
+    </div>
+
+  </div>
+
+  <!-- ══════════ 右欄：預覽與下載 ══════════ -->
+  <div class="preview">
+    <div class="card">
+      <div class="tabs">
+        <button id="tabSite" aria-pressed="true">網站</button>
+        <button id="tabCard" aria-pressed="false">名片圖</button>
+      </div>
+
+      <div class="phone" id="siteWrap"><iframe id="siteFrame" title="網站預覽"></iframe></div>
+      <div id="cardWrap" hidden><canvas id="cardPreview" width="1040" height="1040"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2>下載</h2>
+      <p class="hint">一個 ZIP，裡面是上線需要的全部檔案。</p>
+      <button class="btn primary" id="btnZip">下載名片包 (.zip)</button>
+      <div class="status" id="status"></div>
+      <table class="kv">
+        <tr><td>index.html</td><td>自我介紹網站，照片已內嵌</td></tr>
+        <tr><td>card.png</td><td>1040×1040，給 LINE 圖文訊息</td></tr>
+        <tr><td>card-flex.jpg</td><td>1024×1024，給聊天室分享</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>第一步 · 讓網站上線</h2>
+      <p class="hint">下載的 ZIP 解壓縮後，要把裡面的檔案放到網路上，才會有網址可以給別人。兩種方式選一種就好。</p>
+
+      <table class="compare">
+        <tr><th></th><th>Netlify Drop</th><th>GitHub Pages</th></tr>
+        <tr><td>難度</td><td>最簡單，拖曳即可</td><td>步驟較多，但都是點選</td></tr>
+        <tr><td>要帳號</td><td>要（可用 Google 登入）</td><td>要（GitHub 帳號）</td></tr>
+        <tr><td>網址</td><td>隨機名稱，可自訂</td><td>含你的帳號名稱</td></tr>
+        <tr><td>改內容</td><td>整包重拖一次</td><td>上傳同名檔覆蓋</td></tr>
+        <tr><td>費用</td><td>免費</td><td>免費</td></tr>
+      </table>
+
+      <details class="way" open>
+        <summary>方式 A · Netlify Drop<span class="tagline">最快</span></summary>
+        <ol class="steps">
+          <li><b>先註冊並登入 Netlify</b>：用電腦的一般瀏覽器開
+              <a href="https://app.netlify.com" target="_blank" rel="noopener">app.netlify.com</a>，
+              按 Sign up，用 Google 或 GitHub 一鍵登入。<br>
+              <span style="color:#a8452f">這步一定要在拖檔案之前做。沒登入就拖的話，
+              站台會被擋在登入牆後面，別人打開會看到錯誤，連你自己在 LINE 裡也開不了。</span></li>
+          <li>登入狀態下開 <a href="https://app.netlify.com/drop" target="_blank" rel="noopener">app.netlify.com/drop</a>，
+              把<b>整個資料夾</b>拖進畫面中央的虛線框。</li>
+          <li>幾秒後出現網址，像 <code>https://melodic-tapioca-1a2b3c.netlify.app</code>。</li>
+          <li>（建議）進站台 → <b>Site configuration</b> → <b>Change site name</b>，改成好記的名字。</li>
+          <li>用手機打開確認。<b>把網址記下來</b>，後面會一直用到。</li>
+        </ol>
+        <div class="note">
+          <b>怎麼確認真的公開了：</b>用手機的無痕視窗打開那個網址。
+          跳出 Netlify 登入畫面就是沒登入就拖了，登入後重拖一次即可。
+        </div>
+      </details>
+
+      <details class="way">
+        <summary>方式 B · GitHub Pages<span class="tagline">長期穩定</span></summary>
+        <ol class="steps">
+          <li>沒有帳號的話先註冊：<a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a>（免費）。</li>
+          <li>開 <a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a> 建立新的 repository：<br>
+              ・<b>Repository name</b>：用英文小寫，不要空格，例如 <code>mycard</code><br>
+              ・選 <b>Public</b>　<span style="color:#a8452f">必須公開，免費版的 Pages 只支援公開 repo</span><br>
+              ・<b>不要勾</b> Add a README file<br>
+              ・按 <b>Create repository</b></li>
+          <li>新頁面中間有一行小字 <code>uploading an existing file</code>，點它。</li>
+          <li>把解壓縮後資料夾裡的<b>檔案</b>全部拖進去
+              （<code>index.html</code>、<code>card.png</code>、<code>card-flex.jpg</code>）。<br>
+              <span style="color:#a8452f">這裡拖的是「檔案」，不是資料夾。
+              拖資料夾的話網址會多一層，變成 .../mycard/資料夾名/</span></li>
+          <li>往下捲，按綠色的 <b>Commit changes</b>。</li>
+          <li>repo 上方 <b>Settings</b> → 左欄 <b>Pages</b>：<br>
+              ・Source 選 <code>Deploy from a branch</code><br>
+              ・Branch 選 <code>main</code>，資料夾選 <code>/ (root)</code><br>
+              ・按 <b>Save</b></li>
+          <li>等 1～2 分鐘，重新整理 Settings → Pages，上方會出現
+              <b>Your site is live at</b> 和你的網址：<br>
+              <code>https://你的帳號.github.io/mycard/</code></li>
+          <li>用手機打開確認。<b>把網址記下來</b>。</li>
+        </ol>
+        <div class="note">
+          <b>往後要改內容：</b>回本頁改好、重新下載，然後 repo → <b>Add file</b> →
+          <b>Upload files</b> → 拖同名檔案進去 → Commit。同名會自動覆蓋，不用先刪。
+          改完一樣要等 1～2 分鐘才會生效。<br><br>
+          <b>圖片沒出現？</b>通常是只傳了 <code>index.html</code>、忘了傳圖。
+          直接用瀏覽器打開圖片網址（例如 <code>https://你的帳號.github.io/mycard/card-flex.jpg</code>），
+          看到 404 就是沒傳成功。
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>第二步 · 把名片傳出去</h2>
+      <p class="hint">網站上線後就能用了。三種方式選一種，<b>不需要 LINE 官方帳號</b>。</p>
+
+      <table class="compare">
+        <tr><th></th><th>要準備</th><th>對方看到</th></tr>
+        <tr><td>A 貼網址</td><td>不用準備</td><td>小張連結預覽卡</td></tr>
+        <tr><td>B QR code</td><td>不用準備</td><td>掃完直接開網站</td></tr>
+        <tr><td>C 分享按鈕</td><td>一組 LINE Login channel</td><td><b>大張名片圖</b></td></tr>
+      </table>
+
+      <details class="way" open>
+        <summary>方式 C · 分享按鈕<span class="tagline">推薦</span></summary>
+        <p class="hint" style="margin:0 0 12px">
+          裝好之後，你的名片頁底部會多一顆「分享名片給好友」。
+          <b>任何打開你名片的人都能按</b>，直接把名片轉傳給他自己的好友——名片會自己長腳。
+        </p>
+        <ol class="steps">
+          <li>開 <a href="https://developers.line.biz/console/" target="_blank" rel="noopener">developers.line.biz/console</a>，
+              用你的 LINE 帳號登入。</li>
+          <li>第一次進來要先建一個 <b>Provider</b>（服務提供者），名稱填你的名字或品牌名。
+              <span style="color:#8a7a5e">已經有的話直接點進去。</span></li>
+          <li>按 <b>Create a new channel</b> → 選 <b>LINE Login</b>。<br>
+              <span style="color:#a8452f">一定要選 LINE Login。LIFF 不能建在 Messaging API channel 上。</span><br>
+              <span style="color:#8a7a5e">這不會產生官方帳號，兩者是不同的東西。</span></li>
+          <li>填寫：Channel name 用<b>你的名字 + 電子名片</b>（會顯示在授權畫面上）、
+              App types 勾 <b>Web app</b>、Email 填你的信箱 → 建立。</li>
+          <li>進入剛建好的 channel → 上排 <b>LIFF</b> 頁籤 → <b>Add</b>。</li>
+          <li>填寫：<br>
+              ・LIFF app name：<code>電子名片</code><br>
+              ・Size：<b>Full</b><br>
+              ・Endpoint URL：<b>第一步拿到的網址</b>（結尾斜線要留）<br>
+              ・Scopes：勾 <code>profile</code> 和 <code>chat_message.write</code><br>
+              <span style="color:#a8452f">chat_message.write 沒勾，分享按鈕按下去會失敗。</span><br>
+              ・Bot link feature：Off</li>
+          <li>建好後在 LIFF 頁籤點 <b>shareTargetPicker</b>，跳出的
+              「Agreement Regarding Use of Information」按<b>同意</b>。</li>
+          <li>複製 <b>LIFF ID</b>（像 <code>2011843906-bu8IybC3</code>）。</li>
+          <li><b>回到本頁第 7 格貼上</b> → 重新下載 → 重新上傳覆蓋。</li>
+          <li>用<b>手機的 LINE</b> 開 <code>https://liff.line.me/你的LIFF ID</code>，
+              第一次跳授權畫面按允許，分享按鈕就會出現。</li>
+        </ol>
+        <div class="note">
+          分享按鈕<b>只在 LINE 內建瀏覽器才看得到</b>。用電腦或手機的一般瀏覽器開不會出現，
+          這是正常的，不是壞掉。<br><br>
+          <b>之後換了網址</b>（例如換主機、改 repo 名稱），要回 LIFF 設定把
+          Endpoint URL 一起改掉，否則按鈕會開到舊網址。
+        </div>
+      </details>
+
+      <details class="way">
+        <summary>方式 A · 直接貼網址<span class="tagline">零準備</span></summary>
+        <ol class="steps">
+          <li>複製你的名片網址。</li>
+          <li>在任何聊天室直接貼上送出。</li>
+          <li>LINE 會自動抓取你的名片圖做成預覽卡，對方點了就開啟網站。</li>
+        </ol>
+        <div class="note">
+          最省事，但預覽卡的大小和樣式由 LINE 決定，比不上方式 C 的大圖。<br>
+          如果預覽卡沒顯示圖片，多半是 LINE 還沒抓到那張圖，過幾分鐘再試一次。
+        </div>
+      </details>
+
+      <details class="way">
+        <summary>方式 B · QR code<span class="tagline">面對面</span></summary>
+        <ol class="steps">
+          <li>用 Chrome 開啟你的名片網址。</li>
+          <li>點網址列右側的<b>分享圖示</b> → <b>建立 QR 圖碼</b> → 下載。<br>
+              <span style="color:#8a7a5e">不用另外找產生器，Chrome 內建。</span></li>
+          <li>把那張圖存進手機相簿，見面時給對方掃；或印在實體名片、貼紙、海報上。</li>
+        </ol>
+        <div class="note">
+          適合面對面交換。對方掃完直接開啟網站，不用加好友、不用輸入任何東西。
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>第三步 · 加好友自動發名片
+        <span style="font-weight:400;letter-spacing:.02em;color:var(--dim);text-transform:none;font-size:11.5px">非必要</span>
+      </h2>
+      <div class="note" style="margin:0 0 14px">
+        <b>這一段非必要，大多數人不需要。</b>做完第二步，你的名片就已經可以傳給任何人了。<br><br>
+        這裡講的是另一件事：<b>申請一個 LINE 官方帳號</b>，讓別人加你好友時自動收到名片。
+        適合有在經營客戶名單、想累積好友數的人。<br><br>
+        只是想把名片傳給別人的話，<b>整段跳過，到這裡就完成了。</b>
+      </div>
+
+      <details class="way">
+        <summary>官方帳號設定步驟<span class="tagline">選配</span></summary>
+        <ol class="steps">
+          <li>開 <a href="https://manager.line.biz" target="_blank" rel="noopener">manager.line.biz</a>
+              登入，點進你的官方帳號。</li>
+          <li>右上角 <b>設定</b> → 左側 <b>回應設定</b>：<br>
+              「自動回應訊息」設為 <b>開啟</b>、「Webhook」設為 <b>關閉</b>。<br>
+              <span style="color:#8a7a5e">自動回應沒開，歡迎訊息不會發出去。</span></li>
+          <li>回到 <b>主頁</b> → 左側 <b>圖文訊息</b> → <b>建立</b>。</li>
+          <li>標題填 <code>電子名片</code>（只給自己辨識，好友看不到）。</li>
+          <li>按「選擇版型」→ 挑<b>正方形、只有一整格</b>的那個。</li>
+          <li>按「上傳背景圖片」→ 選 ZIP 裡的 <code>card.png</code>。</li>
+          <li>下方「動作」→ 類型選 <b>連結</b> → 網址填<b>第一步拿到的網址</b> → 儲存。<br>
+              <span style="color:#a8452f">這裡不要填 liff.line.me 開頭的網址，會跳授權畫面嚇到剛加好友的人。</span></li>
+          <li>左側 <b>加入好友的歡迎訊息</b> → <b>編輯</b> → 把罐頭文字改成你的招呼 →
+              按 <b>＋</b> 新增 → 選 <b>圖文訊息</b> → 選剛建好的「電子名片」→ 儲存。</li>
+          <li>（建議）左側 <b>自動回應訊息</b> → 建立 → 關鍵字填 <code>名片</code> →
+              內容選同一則圖文訊息。這樣老朋友打「名片」也拿得到。</li>
+        </ol>
+        <div class="note">
+          <b>測試：</b>歡迎訊息只對<b>新加入</b>的好友觸發，自己開對話測不到。
+          主頁 →「增加好友人數」→ 建立行動條碼，找個朋友掃碼加好友試試。<br><br>
+          <b>注意：</b>圖文訊息存檔後<b>不能換圖</b>，要改得重新建一則再回歡迎訊息換掉。
+        </div>
+      </details>
+    </div>
+
+</div>
+
+<footer>資料只留在你自己的瀏覽器裡，不會上傳到任何伺服器。</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   狀態
+   ═══════════════════════════════════════════════════════════ */
+const PALETTES = [
+  { key:"sage",   accent:"#7d9a74", second:"#8fa8c0", label:"苔綠" },
+  { key:"gold",   accent:"#c2994e", second:"#8a9bab", label:"香檳金" },
+  { key:"indigo", accent:"#5b6ea8", second:"#8aa0bd", label:"靛藍" },
+  { key:"clay",   accent:"#b06a4f", second:"#9c8f7d", label:"磚紅" },
+  { key:"ink",    accent:"#4a4a48", second:"#8d8d88", label:"墨黑" },
+];
+
+const DEMO = {
+  name:"王子齊", nameEn:"Tzu-Chi Wang",
+  role:"品牌行銷企劃", org:"樸石品牌顧問",
+  tagline:"把產品的好，說成別人聽得懂的話。",
+  bio:"做了八年品牌溝通，從食品、生活用品到地方創生都接過。習慣先搞懂東西到底好在哪，再決定要用什麼方式講。\n\n相信行銷不是把平凡講得厲害，而是把真正的優點講到對的人耳朵裡。長期合作的客戶多半是從一支影片開始的。",
+  tags:"品牌策略, 內容企劃, 社群經營, 影像製作",
+  expTitle:"經歷",
+  exp:"樸石品牌顧問 共同創辦人｜2021–\n前連鎖餐飲集團 行銷經理｜2017–2021\n政治大學 廣告學系｜學歷",
+  ig:"example.brand", fb:"", yt:"", ytName:"", site:"",
+  email:"hello@example.com", phone:"0900000000",
+  contactMode:"hide", liff:"", palette:"sage", photo:"", photoFull:"", focal:30, layout:"frame",
+};
+
+const S = {
+  name:"", nameEn:"", role:"", org:"", tagline:"",
+  bio:"", tags:"", expTitle:"", exp:"", ig:"", fb:"", yt:"", ytName:"", site:"",
+  email:"", phone:"", contactMode:"hide", liff:"",
+  palette:"sage", photo:"", photoFull:"", focal:30, layout:"frame",
+};
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+                   .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const pal = () => PALETTES.find(p => p.key === S.palette) || PALETTES[0];
+
+/* ═══════════════════════════════════════════════════════════
+   表單綁定
+   ═══════════════════════════════════════════════════════════ */
+const FIELDS = ["name","nameEn","role","org","tagline","bio","tags","expTitle","exp",
+                "ig","fb","yt","ytName","site","email","phone","liff"];
+
+FIELDS.forEach(k => {
+  const el = $("f_" + k);
+  if (el) el.addEventListener("input", () => { S[k] = el.value; save(); render(); });
+});
+
+$("layoutMode").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  S.layout = b.dataset.v;
+  [...e.currentTarget.children].forEach(x => x.setAttribute("aria-pressed", x === b));
+  save(); render();
+});
+
+$("contactMode").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  S.contactMode = b.dataset.v;
+  [...e.currentTarget.children].forEach(x => x.setAttribute("aria-pressed", x === b));
+  save(); render();
+});
+
+const sw = $("swatches");
+PALETTES.forEach(p => {
+  const b = document.createElement("button");
+  b.className = "sw"; b.style.background = p.accent; b.title = p.label;
+  b.setAttribute("aria-pressed", p.key === S.palette);
+  b.addEventListener("click", () => {
+    S.palette = p.key;
+    [...sw.children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    save(); render();
+  });
+  sw.appendChild(b);
+});
+
+/* ═══════════════════════════════════════════════════════════
+   照片：裁成 3:4、壓到寬 800
+   ═══════════════════════════════════════════════════════════ */
+let srcImg = null;
+
+function cropPhoto(){
+  if (!srcImg) { S.photo = ""; return; }
+  const ratio = 3/4;
+  let cw = srcImg.width, ch = cw / ratio;
+  if (ch > srcImg.height) { ch = srcImg.height; cw = ch * ratio; }
+  const sx = (srcImg.width - cw) / 2;
+  const maxY = srcImg.height - ch;
+  const sy = Math.min(maxY, Math.max(0, maxY * (S.focal / 100)));
+
+  const outW = 800, outH = Math.round(outW / ratio);
+  const c = document.createElement("canvas");
+  c.width = outW; c.height = outH;
+  const x = c.getContext("2d");
+  x.imageSmoothingQuality = "high";
+  x.drawImage(srcImg, sx, sy, cw, ch, 0, 0, outW, outH);
+  S.photo = c.toDataURL("image/jpeg", 0.88);
+
+  // 滿版版型要鋪滿整張卡，需要較高解析度，另存一份原比例的
+  const long = Math.max(srcImg.width, srcImg.height);
+  const k = Math.min(1, 1600 / long);
+  const f = document.createElement("canvas");
+  f.width = Math.round(srcImg.width * k); f.height = Math.round(srcImg.height * k);
+  const fx = f.getContext("2d");
+  fx.imageSmoothingQuality = "high";
+  fx.drawImage(srcImg, 0, 0, f.width, f.height);
+  S.photoFull = f.toDataURL("image/jpeg", 0.86);
+}
+
+function loadPhoto(file){
+  if (!file || !/^image\//.test(file.type)) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      srcImg = im; $("cropCtl").hidden = false;
+      cropPhoto(); save(); render();
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+
+$("drop").addEventListener("click", () => $("file").click());
+$("file").addEventListener("change", e => loadPhoto(e.target.files[0]));
+["dragenter","dragover"].forEach(ev =>
+  $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave","drop"].forEach(ev =>
+  $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", e => loadPhoto(e.dataTransfer.files[0]));
+
+$("focal").addEventListener("input", e => {
+  S.focal = +e.target.value;
+  $("focalVal").textContent = S.focal + "%";
+  cropPhoto(); save(); render();
+});
+
+/* ═══════════════════════════════════════════════════════════
+   產生 index.html
+   ═══════════════════════════════════════════════════════════ */
+const ICON = {
+  ig:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  fb:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z"/></svg>',
+  yt:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg>',
+  web:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18A15 15 0 0 1 12 3"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  tel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h3l2 5-2.5 1.5a12 12 0 0 0 6 6L15 13l5 2v3a2 2 0 0 1-2.2 2A17 17 0 0 1 3 5.2 2 2 0 0 1 5 3z"/></svg>',
+  chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>',
+};
+
+function slink(href, cls, icon, title, sub){
+  return '<a class="slink" href="' + esc(href) + '" target="_blank" rel="noopener">'
+       + '<span class="mark ' + cls + '">' + icon + '</span>'
+       + '<span class="t"><b>' + esc(title) + '</b><span>' + esc(sub) + '</span></span>'
+       + ICON.chev + '</a>';
+}
+
+function telHref(p){
+  const d = String(p).replace(/[^0-9+]/g, "");
+  return d.startsWith("0") ? "+886" + d.slice(1) : d;
+}
+
+function buildLinks(){
+  let h = "";
+  if (S.ig)   h += slink("https://instagram.com/" + S.ig.replace(/^@/,""), "ig", ICON.ig, "Instagram", "@" + S.ig.replace(/^@/,""));
+  if (S.fb)   h += slink(S.fb, "fb", ICON.fb, "Facebook", S.name || "");
+  if (S.yt)   h += slink(S.yt, "yt", ICON.yt, "YouTube", S.ytName || "");
+  if (S.site) h += slink(S.site, "web", ICON.web, "個人網站", S.site.replace(/^https?:\/\//,"").replace(/\/$/,""));
+  return h;
+}
+
+function buildExp(){
+  const rows = (S.exp || "").split("\n").map(t => t.trim()).filter(Boolean);
+  if (!rows.length) return "";
+  const li = rows.map(r => {
+    const [main, sub] = r.split(/[｜|]/);
+    return '<li><span class="m">' + esc((main||"").trim()) + '</span>'
+         + (sub ? '<span class="s">' + esc(sub.trim()) + '</span>' : '') + '</li>';
+  }).join("");
+  return '<section><h2 class="eyebrow">' + esc(S.expTitle || "經歷") + '</h2>'
+       + '<ul class="exp">' + li + '</ul></section>';
+}
+
+function buildContact(){
+  if (!S.email && !S.phone) return "";
+  let inner;
+  if (S.contactMode === "show") {
+    let rows = "";
+    if (S.email) rows += '<li><a href="mailto:' + esc(S.email) + '">' + ICON.mail
+      + '<span class="lbl">Email</span><span class="val">' + esc(S.email) + '</span>' + ICON.chev + '</a></li>';
+    if (S.phone) rows += '<li><a href="tel:' + esc(telHref(S.phone)) + '">' + ICON.tel
+      + '<span class="lbl">電話</span><span class="val">' + esc(S.phone) + '</span>' + ICON.chev + '</a></li>';
+    inner = '<ul class="links">' + rows + '</ul>';
+  } else {
+    inner = '<div class="contact-card">'
+      + '<svg class="cc-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">'
+      + '<rect x="2.5" y="5" width="19" height="14.5" rx="2.5"/><circle cx="9" cy="11" r="2.4"/>'
+      + '<path d="M5.4 16.6c.5-1.7 1.9-2.6 3.6-2.6s3.1.9 3.6 2.6"/><path d="M15.5 10.5h3.5M15.5 13.6h3.5"/></svg>'
+      + '<div class="cc-t"><b>聯絡方式在聯絡人檔裡</b><span>按下方「存聯絡人」直接存進通訊錄</span></div></div>';
+  }
+  return '<section><h2 class="eyebrow">Contact</h2>' + inner + '</section>';
+}
+
+function buildIndexHtml(){
+  const p = pal();
+  const bioHtml = (S.bio || "").split(/\n\s*\n/).filter(Boolean)
+    .map(t => "<p>" + esc(t.trim()).replace(/\n/g,"<br>") + "</p>").join("\n      ");
+  const tagsHtml = (S.tags || "").split(/[,、，]/).map(t => t.trim()).filter(Boolean)
+    .map(t => "<li>" + esc(t) + "</li>").join("");
+  const tagBr = esc(S.tagline).replace("，", "，<br>");
+
+  const profile = {
+    name:S.name, nameEn:S.nameEn, title:S.role, org:S.org, tagline:S.tagline,
+    phone:S.phone ? telHref(S.phone) : "", email:S.email, website:S.site,
+    instagram:S.ig ? "https://instagram.com/" + S.ig.replace(/^@/,"") : "",
+    facebook:S.fb, youtube:S.yt,
+  };
+
+  return TPL
+    .replace(/\{\{TITLE\}\}/g,   esc(S.name + (S.role ? " ∙ " + S.role : "")))
+    .replace(/\{\{DESC\}\}/g,    esc(S.tagline))
+    .replace(/\{\{ACCENT\}\}/g,  p.accent)
+    .replace(/\{\{ACCENT2\}\}/g, p.second)
+    .replace(/\{\{ACCENT_RGB\}\}/g, hexToRgb(p.accent))
+    .replace(/\{\{PHOTO\}\}/g,   (isFull() ? (S.photoFull || S.photo) : S.photo) || "")
+    .replace(/\{\{FOCALPOS\}\}/g, String(S.focal))
+    .replace(/\{\{INITIAL\}\}/g, esc((S.name || "名").slice(0,1)))
+    .replace(/\{\{NAME\}\}/g,    esc(S.name))
+    .replace(/\{\{NAME_EN\}\}/g, S.nameEn ? '<p class="name-en">' + esc(S.nameEn) + '</p>' : "")
+    .replace(/\{\{ROLE\}\}/g,    S.role ? '<p class="role">' + esc(S.role) + '</p>' : "")
+    .replace(/\{\{ORG\}\}/g,     S.org ? '<p class="org">' + esc(S.org) + '</p>' : "")
+    .replace(/\{\{LEAD\}\}/g,     S.tagline ? '<div class="lead"><p>' + tagBr + '</p></div>' : "")
+    .replace(/\{\{HEROCLASS\}\}/g, isFull() ? "" : "frame")
+    .replace(/\{\{BIO\}\}/g,     bioHtml)
+    .replace(/\{\{TAGS\}\}/g,    tagsHtml ? '<ul class="tags">' + tagsHtml + '</ul>' : "")
+    .replace(/\{\{EXP\}\}/g,     buildExp())
+    .replace(/\{\{LINKS\}\}/g,   buildLinks())
+    .replace(/\{\{CONTACT\}\}/g, buildContact())
+    .replace(/\{\{FOOTER\}\}/g,  esc(S.nameEn || S.name))
+    .replace(/\{\{PROFILE\}\}/g, JSON.stringify(profile, null, 2).replace(/<\//g, "<\/"))
+    .replace(/\{\{LIFF\}\}/g,    esc(S.liff.trim()))
+    .replace(/\{\{ASPECT\}\}/g,  isFull() ? "2:3" : "1:1");
+}
+
+function hexToRgb(h){
+  const n = parseInt(h.slice(1), 16);
+  return [(n>>16)&255, (n>>8)&255, n&255].join(",");
+}
+
+/* ═══════════════════════════════════════════════════════════
+   畫名片圖（原生 Canvas，不依賴截圖套件）
+   ═══════════════════════════════════════════════════════════ */
+/* 還沒上傳照片時，畫一塊明確的佔位提示，而不是一片灰底 */
+function photoPlaceholder(c, x, y, w, h, u){
+  const g = c.createLinearGradient(x, y, x + w, y + h);
+  g.addColorStop(0, "#f2eee6"); g.addColorStop(1, "#e4ded2");
+  c.fillStyle = g; c.fillRect(x, y, w, h);
+
+  const bw = Math.min(w, h) * 0.46;
+  const bx = x + (w - bw) / 2, by = y + (h - bw) / 2 - u(10);
+
+  c.save();
+  c.strokeStyle = "#bdb4a4"; c.lineWidth = Math.max(2, u(3));
+  c.setLineDash([u(14), u(10)]);
+  roundRect(c, bx, by, bw, bw, u(14)); c.stroke();
+  c.restore();
+
+  // 相機圖示
+  const cx = bx + bw / 2, cy = by + bw / 2, s = bw * 0.30;
+  c.save();
+  c.strokeStyle = "#a99f8d"; c.lineWidth = Math.max(2, u(3.4));
+  c.lineJoin = "round";
+  roundRect(c, cx - s, cy - s * 0.72, s * 2, s * 1.44, s * 0.22); c.stroke();
+  c.beginPath(); c.arc(cx, cy + s * 0.08, s * 0.42, 0, Math.PI * 2); c.stroke();
+  c.beginPath();
+  c.moveTo(cx - s * 0.42, cy - s * 0.72);
+  c.lineTo(cx - s * 0.26, cy - s * 1.04);
+  c.lineTo(cx + s * 0.26, cy - s * 1.04);
+  c.lineTo(cx + s * 0.42, cy - s * 0.72);
+  c.stroke();
+  c.restore();
+
+  c.fillStyle = "#9a9080";
+  c.textAlign = "center"; c.textBaseline = "alphabetic";
+  c.font = "500 " + u(26) + "px " + FONT;
+  c.fillText("上傳照片後顯示在這裡", x + w / 2, by + bw + u(46));
+}
+
+function roundRect(c, x, y, w, h, r){
+  c.beginPath();
+  c.moveTo(x+r, y); c.arcTo(x+w, y, x+w, y+h, r); c.arcTo(x+w, y+h, x, y+h, r);
+  c.arcTo(x, y+h, x, y, r); c.arcTo(x, y, x+w, y, r); c.closePath();
+}
+
+function drawCard(canvas, w, h){
+  if (isFull()) return drawFull(canvas, w, h || w);
+  return drawFrame(canvas, w);
+}
+
+/* ───────── 滿版：照片鋪滿 + 下方漸層 + 文字疊上 ───────── */
+function drawFull(canvas, w, h){
+  const u = n => n * (w / 1040);
+  const c = canvas.getContext("2d");
+  const p = pal();
+  canvas.width = w; canvas.height = h;
+
+  const im = fullImg || photoImg;
+  if (im && im.complete && im.naturalWidth) {
+    const k = Math.max(w / im.naturalWidth, h / im.naturalHeight);
+    const dw = im.naturalWidth * k, dh = im.naturalHeight * k;
+    const dy = Math.min(0, -(dh - h) * (S.focal / 100));
+    c.drawImage(im, (w - dw) / 2, dy, dw, dh);
+  } else {
+    photoPlaceholder(c, 0, 0, w, h, u);
+  }
+
+  // 下半漸層，確保文字看得清楚
+  const sh = c.createLinearGradient(0, h * 0.28, 0, h);
+  sh.addColorStop(0, "rgba(16,18,22,0)");
+  sh.addColorStop(.42, "rgba(16,18,22,.52)");
+  sh.addColorStop(1, "rgba(16,18,22,.93)");
+  c.fillStyle = sh; c.fillRect(0, h * 0.28, w, h * 0.72);
+
+  const padX = u(62);
+  let y = h - u(54);
+
+  const soft = S.layout === "soft";
+
+  // 底部提示列：低調版用半透明白，強烈版用主色實心
+  const bh = u(82);
+  y -= bh;
+  roundRect(c, padX, y, w - padX * 2, bh, u(16));
+  if (soft){
+    c.fillStyle = "rgba(255,255,255,.17)"; c.fill();
+    c.strokeStyle = "rgba(255,255,255,.38)"; c.lineWidth = u(2); c.stroke();
+    c.fillStyle = "#fff";
+  } else {
+    c.fillStyle = p.accent; c.fill();
+    c.fillStyle = "#1b1a18";
+  }
+  c.textAlign = "center"; c.textBaseline = "middle";
+  c.font = "600 " + u(28) + "px " + FONT;
+  setSpacing(c, u(4));
+  c.fillText("點一下看完整介紹", w / 2 + u(2), y + bh / 2 + u(1));
+  setSpacing(c, 0);
+
+  c.textAlign = "left"; c.textBaseline = "alphabetic";
+  y -= u(34);
+
+  // IG 帳號（兩種版型共用）
+  if (S.ig){
+    c.fillStyle = "rgba(255,255,255,.60)";
+    c.font = "400 " + u(25) + "px " + FONT;
+    setSpacing(c, u(2));
+    c.fillText("@" + S.ig.replace(/^@/,""), padX, y);
+    setSpacing(c, 0);
+    y -= u(42);
+  }
+
+  // 標語
+  const tl = (S.tagline || "").split("，").filter(Boolean);
+  if (tl.length > 1) tl[0] += "，";
+  if (tl.length){
+    c.fillStyle = "rgba(255,255,255,.78)";
+    c.font = "400 " + u(soft ? 26 : 27) + "px " + FONT;
+    for (let i = tl.length - 1; i >= 0; i--){ c.fillText(tl[i].trim(), padX, y); y -= u(40); }
+    y -= u(4);
+  }
+
+  if (soft){
+    /* ── 低調：職稱與單位串成一行，姓名與英文名同一行 ── */
+    const sub = [S.role, S.org].filter(Boolean).join("　·　");
+    if (sub){
+      c.fillStyle = "rgba(255,255,255,.88)";
+      c.font = "400 " + u(28) + "px " + FONT;
+      setSpacing(c, u(1.5));
+      c.fillText(sub, padX, y);
+      setSpacing(c, 0);
+      y -= u(52);
+    }
+    if (S.name){
+      c.fillStyle = "#fff";
+      c.font = "700 " + u(66) + "px " + FONT;
+      setSpacing(c, u(4));
+      c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = u(18); c.shadowOffsetY = u(3);
+      c.fillText(S.name + (S.nameEn ? "　" + S.nameEn : ""), padX, y);
+      c.shadowColor = "transparent"; c.shadowBlur = 0; c.shadowOffsetY = 0;
+      setSpacing(c, 0);
+    }
+  } else {
+    /* ── 強烈：單位、英文名、姓名各自一行，職稱做成主色標籤 ── */
+    if (S.org){
+      c.fillStyle = "rgba(255,255,255,.90)";
+      c.font = "400 " + u(29) + "px " + FONT;
+      setSpacing(c, u(1.5));
+      c.fillText(S.org, padX, y);
+      setSpacing(c, 0);
+      y -= u(46);
+    }
+    if (S.nameEn){
+      c.fillStyle = "rgba(255,255,255,.60)";
+      c.font = "400 " + u(22) + "px " + FONT;
+      setSpacing(c, u(7));
+      c.fillText(S.nameEn.toUpperCase(), padX, y);
+      setSpacing(c, 0);
+      y -= u(46);
+    }
+    if (S.name){
+      c.fillStyle = "#fff";
+      c.font = "700 " + u(76) + "px " + FONT;
+      setSpacing(c, u(5));
+      c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = u(18); c.shadowOffsetY = u(3);
+      c.fillText(S.name, padX, y);
+      c.shadowColor = "transparent"; c.shadowBlur = 0; c.shadowOffsetY = 0;
+      setSpacing(c, 0);
+      // 76px 中文字往基線上方延伸約 67px，再加標籤高 52px 與間距 21px
+      y -= u(140);
+    }
+    if (S.role){
+      c.font = "700 " + u(24) + "px " + FONT;
+      setSpacing(c, u(3));
+      const tw = c.measureText(S.role).width;
+      const chW = tw + u(30), chH = u(52);
+      roundRect(c, padX, y, chW, chH, u(7));
+      c.fillStyle = p.accent; c.fill();
+      c.fillStyle = "#1b1a18";
+      c.textAlign = "center"; c.textBaseline = "middle";
+      c.fillText(S.role, padX + chW / 2 + u(1.5), y + chH / 2 + u(1));
+      c.textAlign = "left"; c.textBaseline = "alphabetic";
+      setSpacing(c, 0);
+    }
+  }
+}
+
+/* ───────── 框式：米白底 + 照片放在圓角框裡 ───────── */
+function drawFrame(canvas, size){
+  const S0 = size / 1040;                       // 以 1040 為設計基準等比縮放
+  const u = n => n * S0;
+  const c = canvas.getContext("2d");
+  const p = pal();
+  canvas.width = canvas.height = size;
+
+  // 背景
+  const lg = c.createLinearGradient(0, 0, size*0.4, size);
+  lg.addColorStop(0, "#f8f5f0"); lg.addColorStop(1, "#ece7dd");
+  c.fillStyle = lg; c.fillRect(0, 0, size, size);
+  const rg = c.createRadialGradient(size/2, u(20), 0, size/2, u(20), size*0.78);
+  rg.addColorStop(0, "rgba(255,254,251,.95)"); rg.addColorStop(1, "rgba(255,254,251,0)");
+  c.fillStyle = rg; c.fillRect(0, 0, size, size);
+
+  // 頂部漸隱色條
+  const tg = c.createLinearGradient(0, 0, size, 0);
+  tg.addColorStop(0, "rgba(" + hexToRgb(p.accent) + ",0)");
+  tg.addColorStop(.5, p.accent);
+  tg.addColorStop(1, "rgba(" + hexToRgb(p.accent) + ",0)");
+  c.fillStyle = tg; c.fillRect(0, 0, size, u(8));
+
+  // ── 量測總高後垂直置中 ──
+  const pw = u(252), ph = u(336);
+  const hasEn = !!S.nameEn, hasRole = !!S.role, hasOrg = !!S.org;
+  const tagLines = (S.tagline || "").split("，").filter(Boolean);
+  if (tagLines.length > 1) tagLines[0] += "，";
+
+  let total = ph;
+  if (S.name)  total += u(36) + u(92);
+  if (hasEn)   total += u(16) + u(30);
+  if (hasRole) total += u(26) + u(62);
+  if (hasOrg)  total += u(16) + u(36);
+  if (tagLines.length) total += u(30) + tagLines.length * u(46);
+  const footLines = (S.ig ? 1 : 0) + 1;
+  total += u(34) + footLines * u(36);
+
+  let y = Math.max(u(40), (size - total) / 2);
+
+  // 照片
+  const px = (size - pw) / 2;
+  c.save();
+  c.shadowColor = "rgba(60,52,40,.42)"; c.shadowBlur = u(44); c.shadowOffsetY = u(22);
+  c.fillStyle = "#fffdfa";
+  roundRect(c, px - u(9), y - u(9), pw + u(18), ph + u(18), u(30)); c.fill();
+  c.restore();
+
+  roundRect(c, px, y, pw, ph, u(22));
+  c.save(); c.clip();
+  if (photoImg && photoImg.complete && photoImg.naturalWidth) {
+    c.drawImage(photoImg, px, y, pw, ph);
+  } else {
+    photoPlaceholder(c, px, y, pw, ph, u);
+  }
+  c.restore();
+  y += ph;
+
+  c.textAlign = "center"; c.textBaseline = "alphabetic";
+
+  if (S.name){
+    y += u(36) + u(74);
+    c.fillStyle = "#2b2824";
+    c.font = "600 " + u(84) + "px " + FONT;
+    setSpacing(c, u(8));
+    c.fillText(S.name, size/2 + u(4), y);
+    setSpacing(c, 0);
+    y += u(18);
+  }
+  if (hasEn){
+    y += u(16) + u(22);
+    c.fillStyle = "#7f7a70";
+    c.font = "400 " + u(24) + "px " + FONT;
+    setSpacing(c, u(11));
+    c.fillText(S.nameEn.toUpperCase(), size/2 + u(5), y);
+    setSpacing(c, 0);
+    y += u(8);
+  }
+  if (hasRole){
+    y += u(26);
+    c.font = "500 " + u(31) + "px " + FONT;
+    setSpacing(c, u(3));
+    const tw = c.measureText(S.role).width;
+    const bw = tw + u(60), bh = u(62), bx = (size - bw)/2;
+    c.fillStyle = "rgba(" + hexToRgb(p.accent) + ",.09)";
+    roundRect(c, bx, y, bw, bh, bh/2); c.fill();
+    c.strokeStyle = "rgba(" + hexToRgb(p.accent) + ",.45)";
+    c.lineWidth = u(2); c.stroke();
+    c.fillStyle = p.accent;
+    c.fillText(S.role, size/2 + u(1.5), y + bh*0.68);
+    setSpacing(c, 0);
+    y += bh;
+  }
+  if (hasOrg){
+    y += u(16) + u(28);
+    c.fillStyle = "#7f7a70";
+    c.font = "400 " + u(28) + "px " + FONT;
+    setSpacing(c, u(2));
+    c.fillText(S.org, size/2 + u(1), y);
+    setSpacing(c, 0);
+    y += u(8);
+  }
+  if (tagLines.length){
+    y += u(30);
+    c.fillStyle = "#5d584f";
+    c.font = "400 " + u(27) + "px " + FONT;
+    tagLines.forEach(t => { y += u(40); c.fillText(t.trim(), size/2, y); y += u(6); });
+  }
+
+  y += u(34);
+  if (S.ig){
+    y += u(26);
+    c.fillStyle = "#7f7a70";
+    c.font = "400 " + u(24) + "px " + FONT;
+    setSpacing(c, u(3));
+    c.fillText("@" + S.ig.replace(/^@/,""), size/2 + u(1.5), y);
+    setSpacing(c, 0);
+    y += u(10);
+  }
+  y += u(26);
+  c.fillStyle = p.accent;
+  c.font = "600 " + u(24) + "px " + FONT;
+  setSpacing(c, u(5));
+  c.fillText("點一下看完整介紹", size/2 + u(2.5), y);
+  setSpacing(c, 0);
+}
+
+// 滿版用 2:3 直式，框式維持正方形
+const isFull = () => S.layout === "full" || S.layout === "soft";
+const flexH = w => isFull() ? Math.round(w * 1.5) : w;
+const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+function setSpacing(c, px){ if ("letterSpacing" in c) c.letterSpacing = px + "px"; }
+
+let photoImg = null, fullImg = null;
+function syncPhotoImg(cb){
+  let left = 2;
+  const done = () => { if (--left === 0) cb(); };
+  const grab = (src, set) => {
+    if (!src) { set(null); return done(); }
+    const im = new Image();
+    im.onload = () => { set(im); done(); };
+    im.onerror = () => { set(null); done(); };
+    im.src = src;
+  };
+  grab(S.photo,     i => photoImg = i);
+  grab(S.photoFull, i => fullImg  = i);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   預覽
+   ═══════════════════════════════════════════════════════════ */
+let t;
+function render(){
+  clearTimeout(t);
+  t = setTimeout(() => {
+    $("fullTip").hidden = S.layout === "frame";
+    $("siteFrame").srcdoc = buildIndexHtml();
+    syncPhotoImg(() => drawCard($("cardPreview"), 1040, flexH(1040)));
+  }, 180);
+}
+
+$("tabSite").addEventListener("click", () => switchTab(true));
+$("tabCard").addEventListener("click", () => switchTab(false));
+function switchTab(site){
+  $("siteWrap").hidden = !site; $("cardWrap").hidden = site;
+  $("tabSite").setAttribute("aria-pressed", site);
+  $("tabCard").setAttribute("aria-pressed", !site);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   下載
+   ═══════════════════════════════════════════════════════════ */
+$("btnZip").addEventListener("click", async () => {
+  const btn = $("btnZip"), st = $("status");
+  if (!S.name) { st.textContent = "請至少填姓名。"; return; }
+  btn.disabled = true; st.textContent = "打包中…";
+  try {
+    await new Promise(r => syncPhotoImg(r));
+
+    const big = document.createElement("canvas");
+    drawCard(big, 1040, 1040);          // 圖文訊息固定正方形
+    const small = document.createElement("canvas");
+    drawCard(small, 1024, flexH(1024)); // Flex 可以直式
+
+    const toBlob = (cv, type, q) => new Promise(r => cv.toBlob(r, type, q));
+    const zip = new JSZip();
+    zip.file("index.html", buildIndexHtml());
+    zip.file("card.png", await toBlob(big, "image/png"));
+    zip.file("card-flex.jpg", await toBlob(small, "image/jpeg", 0.9));
+    zip.file("說明.txt", READNME());
+
+    const blob = await zip.generateAsync({ type:"blob" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = (S.nameEn || S.name).replace(/\s+/g,"-") + "-namecard.zip";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    st.textContent = "完成，共 " + Math.round(blob.size/1024) + " KB。";
+  } catch (err) {
+    console.error(err);
+    st.textContent = "打包失敗，請看瀏覽器主控台。";
+  } finally { btn.disabled = false; }
+});
+
+function READNME(){
+  return [
+"LINE 電子名片 — " + S.name,
+"",
+"【這個資料夾裡有什麼】",
+"index.html      你的自我介紹網站，照片已經內嵌在裡面，單獨一個檔就能跑",
+"card.png        1040x1040，給 LINE 官方帳號的「圖文訊息」用",
+"card-flex.jpg   1024x1024，在聊天室分享名片時顯示的圖",
+"",
+"【怎麼上線】兩種方式選一種",
+"",
+"── 方式 A：Netlify Drop（最快）──",
+"1. ★先註冊並登入 Netlify：用電腦的一般瀏覽器開 https://app.netlify.com",
+"   按 Sign up，用 Google 或 GitHub 一鍵登入，免費。",
+"   這步一定要在拖檔案之前做。沒登入就拖的話，站台會被擋在登入牆後面，",
+"   別人打開會看到錯誤，你自己在 LINE 裡也開不了。",
+"2. 登入狀態下開 https://app.netlify.com/drop",
+"3. 把這整個資料夾拖進網頁，幾秒後會給你一個網址",
+"4. （建議）進站台 → Site configuration → Change site name，改成好記的名字",
+"5. 用手機的無痕視窗打開確認。如果跳出 Netlify 登入畫面，就是沒登入就拖了，",
+"   登入後重拖一次即可。",
+"",
+"※ 之後要改內容：回產生器改好、重新下載，再拖一次到 Netlify 的同一個站台即可。",
+"",
+"── 方式 B：GitHub Pages（長期穩定）──",
+"1. 沒帳號先註冊 https://github.com/signup（免費）",
+"2. 開 https://github.com/new 建立 repository：",
+"   ・Repository name 用英文小寫不要空格，例如 mycard",
+"   ・選 Public（必須公開，免費版 Pages 只支援公開 repo）",
+"   ・不要勾 Add a README file",
+"   ・按 Create repository",
+"3. 新頁面中間點那行小字 uploading an existing file",
+"4. 把這個資料夾裡的「檔案」全部拖進去（index.html、card.png、card-flex.jpg）",
+"   ★ 拖的是檔案，不是資料夾。拖資料夾網址會多一層。",
+"5. 往下捲，按綠色的 Commit changes",
+"6. repo 上方 Settings → 左欄 Pages：",
+"   ・Source 選 Deploy from a branch",
+"   ・Branch 選 main，資料夾選 /(root)",
+"   ・按 Save",
+"7. 等 1~2 分鐘，重新整理 Settings → Pages，上方會出現",
+"   Your site is live at https://你的帳號.github.io/mycard/",
+"8. 用手機打開確認",
+"",
+"※ 之後要改內容：repo → Add file → Upload files → 拖同名檔案 → Commit。",
+"   同名自動覆蓋，改完一樣等 1~2 分鐘生效。",
+"※ 圖片沒出現？多半是只傳了 index.html 忘了傳圖。",
+"   直接用瀏覽器開圖片網址，看到 404 就是沒傳成功。",
+"",
+"【把名片傳出去】三種方式選一種，都不需要 LINE 官方帳號",
+"",
+"── 方式 C：分享按鈕（推薦）──",
+"裝好之後名片頁底部會多一顆「分享名片給好友」。",
+"任何打開你名片的人都能按，直接轉傳給他自己的好友，名片會自己長腳。",
+"1. 開 https://developers.line.biz/console/ 用 LINE 帳號登入",
+"2. 第一次進來要先建一個 Provider，名稱填你的名字或品牌名",
+"3. Create a new channel → 選 LINE Login",
+"   ★ 一定要選 LINE Login，LIFF 不能建在 Messaging API channel 上",
+"   ※ 這不會產生官方帳號，兩者是不同的東西",
+"4. Channel name 用「你的名字 + 電子名片」（會顯示在授權畫面上）",
+"   App types 勾 Web app，Email 填你的信箱 → 建立",
+"5. 進入該 channel → 上排 LIFF 頁籤 → Add",
+"6. Size 選 Full",
+"   Endpoint URL 填你的網站網址（結尾斜線要留）",
+"   Scopes 勾 profile 和 chat_message.write",
+"   ★ chat_message.write 沒勾，分享按鈕按下去會失敗",
+"   Bot link feature 選 Off",
+"7. 在 LIFF 頁籤點 shareTargetPicker，同意資訊使用條款",
+"8. 複製 LIFF ID，回產生器第 7 格貼上，重新下載、重新上傳覆蓋",
+"9. 用手機的 LINE 開 https://liff.line.me/你的LIFF ID 測試",
+"",
+"※ 分享按鈕只在 LINE 內建瀏覽器才看得到，用一般瀏覽器開不會出現，這是正常的。",
+"※ 之後換了網址，記得回 LIFF 設定把 Endpoint URL 一起改掉。",
+"",
+"── 方式 A：直接貼網址（零準備）──",
+"在任何聊天室貼上你的名片網址送出即可。",
+"LINE 會自動抓名片圖做成預覽卡，對方點了就開啟網站。",
+"※ 最省事，但預覽卡比方式 C 的大圖小很多。",
+"",
+"── 方式 B：QR code（面對面）──",
+"1. 用 Chrome 開啟你的名片網址",
+"2. 點網址列右側的分享圖示 → 建立 QR 圖碼 → 下載",
+"3. 存進手機相簿給人掃，或印在實體名片、貼紙上",
+"",
+"",
+"【非必要：加好友自動發名片】需要 LINE 官方帳號",
+"★ 這段大多數人不需要。做完上面的步驟，名片就已經可以傳給任何人了。",
+"  這裡講的是另一件事：申請一個 LINE 官方帳號，讓別人加你好友時自動收到名片。",
+"  適合有在經營客戶名單的人。只是想傳名片的話，整段跳過即可。",
+"1. 開 https://manager.line.biz 登入你的官方帳號",
+"2. 設定 → 回應設定 → 「自動回應訊息」開啟、「Webhook」關閉",
+"3. 主頁 → 圖文訊息 → 建立 → 版型選正方形一整格",
+"4. 上傳 card.png",
+"5. 動作選「連結」，網址填你的網站網址",
+"   ★ 不要填 liff.line.me 開頭的，會跳授權畫面嚇到剛加好友的人",
+"6. 儲存",
+"7. 主頁 → 加入好友的歡迎訊息 → 編輯 → 新增 → 圖文訊息 → 選剛剛那則 → 儲存",
+"8. （建議）自動回應訊息 → 建立 → 關鍵字填「名片」→ 選同一則圖文訊息",
+"",
+"※ 圖文訊息存檔後不能換圖，要改得重新建一則。",
+"※ 歡迎訊息只對新加入的好友觸發，自己開對話測不到。",
+"",
+"【挑照片的訣竅】",
+"框式版型：大頭照、去背照最好看，臉在正中間即可。",
+"滿版版型：照片會鋪滿整張卡，下半部被漸層蓋住放文字，",
+"          所以要挑人物位置偏上的半身照或環境照。",
+"          拉「裁切位置」滑桿可以微調垂直位置。",
+"",
+"【想改內容】",
+"回到產生器頁面，資料都還在（存在瀏覽器裡），改完重新下載、重新拖曳即可。",
+  ].join("\r\n");
+}
+
+/* ═══════════════════════════════════════════════════════════
+   記憶 / 還原
+   ═══════════════════════════════════════════════════════════ */
+function save(){
+  try { localStorage.setItem("namecard", JSON.stringify(S)); } catch {}
+}
+function load(){
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem("namecard") || "null"); } catch {}
+  if (!d) return false;
+  Object.assign(S, d);
+  FIELDS.forEach(k => { const el = $("f_" + k); if (el) el.value = S[k] || ""; });
+  $("focal").value = S.focal; $("focalVal").textContent = S.focal + "%";
+  [...$("contactMode").children].forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.v === S.contactMode));
+  [...$("layoutMode").children].forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.v === S.layout));
+  [...sw.children].forEach((b, i) =>
+    b.setAttribute("aria-pressed", PALETTES[i].key === S.palette));
+  if (S.photo) $("cropCtl").hidden = false;
+  return true;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   產出網站的樣板
+   ═══════════════════════════════════════════════════════════ */
+const TPL = `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESC}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESC}}">
+<meta property="og:image" content="card-flex.jpg">
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"><\/script>
+<style>
+  :root{
+    --bg:#f6f3ee; --surface:#fffdfa; --surface-2:#efebe3; --edge:#e3ddd2;
+    --ink:#2b2824; --ink-dim:#7f7a70;
+    --accent:{{ACCENT}}; --accent-2:{{ACCENT2}}; --accent-rgb:{{ACCENT_RGB}};
+    --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,system-ui,sans-serif;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body{
+    margin:0; font-family:var(--font); color:var(--ink);
+    background:#e8e6e0; line-height:1.75;
+  }
+  /* 整站是一支直欄，桌機才不會把直幅照片橫向拉爆 */
+  .shell{
+    max-width:520px; margin:0 auto; min-height:100vh;
+    background:var(--bg); padding-bottom:84px;
+    box-shadow:0 0 60px -20px rgba(60,52,40,.35);
+  }
+  .wrap{ padding:0 22px; }
+
+  /* ───── 首屏：滿版 ───── */
+  .hero{ position:relative; width:100%; height:min(66vh,600px); overflow:hidden; background:#dfdcd5; }
+  .hero .photo{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:50% {{FOCALPOS}}%; display:block;
+  }
+  .hero .veil{
+    position:absolute; inset:0;
+    background:linear-gradient(to bottom,
+      rgba(22,24,28,0) 30%, rgba(22,24,28,.18) 52%,
+      rgba(22,24,28,.72) 82%, rgba(22,24,28,.92) 100%);
+  }
+  .hero .meta{ position:absolute; left:0; right:0; bottom:0; padding:0 24px 26px; }
+  .name{
+    margin:0; font-size:34px; font-weight:700; letter-spacing:.07em; line-height:1.2;
+    color:#fff; text-shadow:0 2px 14px rgba(0,0,0,.45);
+  }
+  .name-en{ margin:7px 0 0; font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.72); }
+  .role{
+    display:inline-block; margin:15px 0 0; padding:5px 14px; font-size:12.5px; letter-spacing:.08em;
+    color:#fff; border:1px solid rgba(255,255,255,.5); border-radius:999px;
+    background:rgba(255,255,255,.14); backdrop-filter:blur(6px);
+  }
+  .org{ margin:10px 0 0; font-size:13px; color:rgba(255,255,255,.86); letter-spacing:.04em; }
+
+  /* ───── 首屏：框式（照片放圓角框，文字在下） ───── */
+  .hero.frame{
+    height:auto; background:transparent; text-align:center;
+    padding-block:max(44px,calc(env(safe-area-inset-top) + 34px)) 6px;
+  }
+  .hero.frame .veil{ display:none; }
+  .hero.frame .photo{
+    position:static; width:150px; height:200px; margin:0 auto;
+    border-radius:18px; border:4px solid var(--surface);
+    box-shadow:0 0 0 1px var(--edge), 0 16px 34px -16px rgba(60,52,40,.5);
+  }
+  .hero.frame .meta{ position:static; padding:22px 24px 0; }
+  .hero.frame .name{ color:var(--ink); text-shadow:none; }
+  .hero.frame .name-en{ color:var(--ink-dim); }
+  .hero.frame .role{
+    color:var(--accent); border-color:rgba(var(--accent-rgb),.4);
+    background:rgba(var(--accent-rgb),.07); backdrop-filter:none;
+  }
+  .hero.frame .org{ color:var(--ink-dim); }
+
+  /* 沒照片時一律走文字版 */
+  .hero.no-photo{ height:auto; background:transparent; text-align:center; padding-block:56px 6px; }
+  .hero.no-photo .veil, .hero.no-photo .photo{ display:none; }
+  .hero.no-photo .meta{ position:static; padding:0 24px; }
+  .hero.no-photo .name{ color:var(--ink); text-shadow:none; }
+  .hero.no-photo .name-en{ color:var(--ink-dim); }
+  .hero.no-photo .role{
+    color:var(--accent); border-color:rgba(var(--accent-rgb),.4);
+    background:rgba(var(--accent-rgb),.07); backdrop-filter:none;
+  }
+  .hero.no-photo .org{ color:var(--ink-dim); }
+
+  /* 標語：首屏下方的引言 */
+  .lead{ text-align:center; padding:34px 24px 6px; }
+  .lead p{ margin:0; font-size:17px; line-height:1.9; color:#413d36; letter-spacing:.02em; }
+  .lead::after{
+    content:""; display:block; width:40px; height:1px; margin:24px auto 0;
+    background:var(--accent); opacity:.65;
+  }
+
+  section{ padding-block:40px; }
+  .eyebrow{
+    margin:0 0 18px; font-size:10.5px; font-weight:600; letter-spacing:.22em;
+    color:var(--accent); text-transform:uppercase; display:flex; align-items:center; gap:12px;
+  }
+  .eyebrow::after{ content:""; flex:1; height:1px; background:var(--edge); }
+  .bio p{ margin:0 0 16px; font-size:14.5px; color:#4e4941; }
+  .bio p:last-child{ margin-bottom:0; }
+  .tags{ list-style:none; margin:22px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+  .tags li{
+    font-size:12px; letter-spacing:.04em; color:var(--ink-dim);
+    border:1px solid var(--edge); border-radius:999px; padding:6px 13px; background:var(--surface);
+  }
+  .exp{ list-style:none; margin:0; padding:0; }
+  .exp li{
+    display:flex; align-items:baseline; gap:12px;
+    padding:13px 0 13px 14px; border-bottom:1px solid var(--edge);
+    position:relative; font-size:14px; line-height:1.75;
+  }
+  .exp li:first-child{ border-top:1px solid var(--edge); }
+  .exp li::before{
+    content:""; position:absolute; left:0; top:21px;
+    width:5px; height:5px; border-radius:50%; background:var(--accent);
+  }
+  .exp .m{ flex:1; }
+  .exp .s{ font-size:11.5px; color:var(--ink-dim); white-space:nowrap; letter-spacing:.04em; }
+
+  .slink{
+    display:flex; align-items:center; gap:13px; padding:14px 16px; text-decoration:none; color:var(--ink);
+    background:var(--surface); border:1px solid var(--edge); border-radius:15px;
+    box-shadow:0 2px 10px -6px rgba(60,52,40,.3);
+    transition:border-color .2s, transform .12s;
+  }
+  .slink + .slink{ margin-top:9px; }
+  .slink:active{ transform:translateY(1px); border-color:var(--accent); }
+  .mark{ width:40px; height:40px; flex:none; border-radius:12px; display:grid; place-items:center; }
+  .mark svg{ width:21px; height:21px; color:#fff; }
+  .mark.ig{ background:linear-gradient(135deg,#f9ce34,#ee2a7b 55%,#6228d7); }
+  .mark.fb{ background:#1877f2; }
+  .mark.yt{ background:#ff0033; }
+  .mark.web{ background:var(--accent-2); }
+  .slink .t{ flex:1; min-width:0; }
+  .slink .t b{ display:block; font-size:14.5px; font-weight:600; letter-spacing:.02em; }
+  .slink .t span{ font-size:12.5px; color:var(--ink-dim); }
+  .chev{ width:15px; height:15px; color:var(--ink-dim); flex:none; }
+  .links{ list-style:none; margin:0; padding:0; }
+  .links li{ border-bottom:1px solid var(--edge); }
+  .links li:first-child{ border-top:1px solid var(--edge); }
+  .links a{
+    display:flex; align-items:center; gap:14px; padding:16px 2px;
+    text-decoration:none; color:var(--ink); font-size:14.5px;
+  }
+  .links svg:not(.chev){ width:18px; height:18px; flex:none; color:var(--accent-2); }
+  .links .lbl{ flex:1; }
+  .links .val{ font-size:11.5px; color:var(--ink-dim); }
+  .contact-card{
+    display:flex; align-items:center; gap:14px; padding:17px 18px; border-radius:15px;
+    background:var(--surface); border:1px solid var(--edge); box-shadow:0 2px 10px -6px rgba(60,52,40,.3);
+  }
+  .cc-ico{ width:34px; height:34px; flex:none; color:var(--accent-2); }
+  .cc-t b{ display:block; font-size:14px; font-weight:600; }
+  .cc-t span{ font-size:12.5px; color:var(--ink-dim); }
+  .dock{
+    position:fixed; left:50%; transform:translateX(-50%);
+    width:100%; max-width:520px; bottom:0; z-index:20;
+    padding:12px 22px; padding-bottom:max(12px,env(safe-area-inset-bottom));
+    background:rgba(246,243,238,.88); backdrop-filter:blur(14px); border-top:1px solid var(--edge);
+  }
+  .dock-inner{ display:flex; gap:9px; }
+  .btn{
+    flex:1; appearance:none; font-family:inherit; cursor:pointer;
+    border:1px solid var(--edge); background:var(--surface); color:var(--ink);
+    border-radius:13px; padding:14px 8px; font-size:13px; letter-spacing:.04em;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+  }
+  .btn.primary{ background:var(--accent); color:#fff; border-color:transparent; font-weight:600; }
+  .btn[hidden]{ display:none !important; }
+  footer{ text-align:center; font-size:10.5px; letter-spacing:.2em; color:var(--ink-dim); opacity:.65; padding:4px 0 30px; }
+  .toast{
+    position:fixed; left:50%; bottom:92px; transform:translate(-50%,16px);
+    background:#2b2824; color:#fffdfa; font-size:12.5px; padding:10px 18px; border-radius:999px;
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:30;
+  }
+  .toast.show{ opacity:1; transform:translate(-50%,0); }
+</style>
+</head>
+<body>
 
 <div class="shell">
 
-  <header class="hero" id="hero">
-    <img id="photo" src="avatar.jpg" alt="李彥勳">
-    <div class="veil"></div>
-    <div class="bar"></div>
-    <div class="meta">
-      <span class="title">總經理</span>
-      <h1>李彥勳</h1>
-      <p class="en">Rex Lee</p>
-      <p class="corp">
-        悅懌生物科技顧問有限公司
-        <span>香港悅懌生物科技顧問有限公司</span>
-      </p>
-    </div>
-  </header>
-
-  <div class="brandband">
-    <img src="logo.jpg" alt="YUE YI 悅懌生技顧問">
-    <ul>
-      <li>創新配方設計</li>
-      <li>市場需求規劃</li>
-      <li>品牌孵化陪跑</li>
-    </ul>
+<header class="hero {{HEROCLASS}}" id="hero">
+  <img class="photo" id="avatar" src="{{PHOTO}}" alt="{{NAME}}">
+  <div class="veil"></div>
+  <div class="meta">
+    <h1 class="name">{{NAME}}</h1>
+    {{NAME_EN}}
+    {{ROLE}}
+    {{ORG}}
   </div>
+</header>
 
-  <main>
+{{LEAD}}
 
-    <section class="rise">
-      <div class="head"><span class="no">01</span><h2>服務項目</h2><span class="en">Services</span></div>
-      <ul class="svc">
-        <li>
-          <span class="n">01</span>
-          <div>
-            <b>創新配方設計</b>
-            <span>從原料評估到配方落地，協助產品在法規與成本之間找到可量產的解法。</span>
-          </div>
-        </li>
-        <li>
-          <span class="n">02</span>
-          <div>
-            <b>市場需求規劃</b>
-            <span>以市場端的真實需求回推產品定位，確認要做什麼、賣給誰、怎麼切入。</span>
-          </div>
-        </li>
-        <li>
-          <span class="n">03</span>
-          <div>
-            <b>品牌孵化 ∙ 陪跑</b>
-            <span>從零到上市的全程陪跑，品牌建立、通路布局到後續調整都一起走。</span>
-          </div>
-        </li>
-      </ul>
-    </section>
+<div class="wrap">
+  <section class="bio">
+    <h2 class="eyebrow">About</h2>
+      {{BIO}}
+    {{TAGS}}
+  </section>
 
-    <section class="rise">
-      <div class="head"><span class="no">02</span><h2>全球據點</h2><span class="en">Offices</span></div>
-      <ul class="sites">
-        <li class="hq"><span class="tag">Headquarters</span>台灣總部 ∙ 桃園</li>
-        <li><span class="tag">Hong Kong</span>香港</li>
-        <li><span class="tag">USA</span>美國</li>
-        <li><span class="tag">Japan</span>日本辦事處</li>
-        <li><span class="tag">Korea</span>韓國辦事處</li>
-      </ul>
-    </section>
+  {{EXP}}
 
-    <section class="rise">
-      <div class="head"><span class="no">03</span><h2>聯絡方式</h2><span class="en">Contact</span></div>
-      <ul class="rows">
-        <li><a href="https://line.me/ti/p/~jesuslovesrex" target="_blank" rel="noopener">
-          <span class="ic line"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.5 3 2 6.6 2 11c0 4 3.6 7.3 8.4 7.9.3.07.8.2.9.5.1.3.07.7.03 1l-.14.8c-.04.24-.2.94.83.5 1-.4 5.5-3.2 7.5-5.5C20.9 14.7 22 13 22 11c0-4.4-4.5-8-10-8zM8.3 13.4H6.2c-.3 0-.5-.2-.5-.5V9.1c0-.3.2-.5.5-.5s.5.2.5.5v3.3h1.6c.3 0 .5.2.5.5s-.2.5-.5.5zm2-.5c0 .3-.2.5-.5.5s-.5-.2-.5-.5V9.1c0-.3.2-.5.5-.5s.5.2.5.5v3.8zm4.5 0c0 .2-.14.4-.35.47a.5.5 0 0 1-.56-.18l-1.95-2.65v2.36c0 .3-.22.5-.5.5s-.5-.2-.5-.5V9.1c0-.2.14-.4.35-.47a.5.5 0 0 1 .56.18l1.95 2.65V9.1c0-.3.22-.5.5-.5s.5.2.5.5v3.8zm3.3-2.4c.28 0 .5.22.5.5s-.22.5-.5.5h-1.6v1.1h1.6c.28 0 .5.22.5.5s-.22.5-.5.5h-2.1a.5.5 0 0 1-.5-.5V9.1c0-.28.22-.5.5-.5h2.1c.28 0 .5.22.5.5s-.22.5-.5.5h-1.6v1.1h1.6z"/></svg></span>
-          <span class="t"><b>Line ID</b><span>jesuslovesrex</span></span>
-          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></a></li>
+  <section>
+    <h2 class="eyebrow">Links</h2>
+    {{LINKS}}
+  </section>
 
-        <li><a href="tel:+886926307241">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 3h3l2 5-2.5 1.5a12 12 0 0 0 6 6L15 13l5 2v3a2 2 0 0 1-2.2 2A17 17 0 0 1 3 5.2 2 2 0 0 1 5 3z"/></svg></span>
-          <span class="t"><b>Mobile</b><span>0926-307-241</span></span>
-          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></a></li>
+  {{CONTACT}}
 
-        <li><a href="tel:+88633463025,,20">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg></span>
-          <span class="t"><b>Tel</b><span>03-3463025 分機 20</span></span>
-          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></a></li>
-
-        <li><a href="mailto:rex@yueyibiotech.com">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
-          <span class="t"><b>Email</b><span>rex@yueyibiotech.com</span></span>
-          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></a></li>
-
-        <li><a href="mailto:yueyibiotech@gmail.com">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
-          <span class="t"><b>Email ∙ 台灣</b><span>yueyibiotech@gmail.com</span></span>
-          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></a></li>
-
-        <li><a href="https://yue-yi.tw" target="_blank" rel="noopener">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18A15 15 0 0 1 12 3"/></svg></span>
-          <span class="t"><b>Website</b><span>yue-yi.tw</span></span>
-          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></a></li>
-
-        <li><a href="https://www.google.com/maps/search/?api=1&query=%E6%A1%83%E5%9C%92%E5%B8%82%E6%A1%83%E5%9C%92%E5%8D%80%E5%90%8C%E5%AE%89%E8%A1%97656%E8%99%9F" target="_blank" rel="noopener">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
-          <span class="t"><b>Address</b><span>330 桃園市桃園區同安街656號2樓</span></span>
-          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></a></li>
-      </ul>
-    </section>
-
-    <section class="rise">
-      <div class="head"><span class="no">04</span><h2>公司資訊</h2><span class="en">Company</span></div>
-      <div class="info">
-        <dl>
-          <dt>Company</dt><dd>悅懌生物科技顧問有限公司</dd>
-          <dt>Group</dt><dd>香港悅懌生物科技顧問有限公司</dd>
-          <dt>統一編號</dt><dd>83513104</dd>
-          <dt>Web</dt><dd><a href="https://yue-yi.tw" target="_blank" rel="noopener">yue-yi.tw</a></dd>
-        </dl>
-      </div>
-    </section>
-
-    <div class="colophon">YUE YI BIOTECH CONSULTING</div>
-  </main>
+  <footer>{{FOOTER}}</footer>
 </div>
+
+</div><!-- /.shell -->
 
 <div class="dock">
-  <a class="line" href="https://line.me/ti/p/~jesuslovesrex" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.5 3 2 6.6 2 11c0 4 3.6 7.3 8.4 7.9.3.07.8.2.9.5.1.3.07.7.03 1l-.14.8c-.04.24-.2.94.83.5 1-.4 5.5-3.2 7.5-5.5C20.9 14.7 22 13 22 11c0-4.4-4.5-8-10-8z"/></svg>
-    加 LINE
-  </a>
-  <button id="btnShare" hidden>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M12 16V3M7 8l5-5 5 5"/></svg>
-    分享名片
-  </button>
-  <button id="btnVcard">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"/></svg>
-    存聯絡人
-  </button>
-  <button id="btnCopy">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M15 5H5a2 2 0 0 0-2 2v10"/></svg>
-    複製連結
-  </button>
+  <div class="dock-inner">
+    <button class="btn primary" id="btnShare" hidden>分享名片給好友</button>
+    <button class="btn" id="btnVcard">存聯絡人</button>
+    <button class="btn" id="btnCopy">複製連結</button>
+  </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-const PROFILE = {
-  name:"李彥勳", nameEn:"Rex Lee",
-  title:"總經理", org:"悅懌生物科技顧問有限公司",
-  tagline:"創新配方設計 ∙ 市場需求規劃 ∙ 品牌孵化陪跑",
-  mobile:"+886926307241",
-  tel:"+88633463025",
-  email:"rex@yueyibiotech.com",
-  email2:"yueyibiotech@gmail.com",
-  website:"https://yue-yi.tw",
-  lineId:"jesuslovesrex",
-  address:"330 桃園市桃園區同安街656號2樓",
-};
-
-// 之後若要加「分享名片給好友」，把 LIFF ID 填進來即可
-const LIFF_ID = "2011843906-bu8IybC3";
+const PROFILE = {{PROFILE}};
+const LIFF_ID = "{{LIFF}}";
+// 名片圖網址由網站自己的位置推算，不用手動填
 const CARD_IMAGE_URL = location.protocol === "https:"
   ? new URL("card-flex.jpg", location.href).href : "";
 
-const photo = document.getElementById("photo");
-photo.addEventListener("error", () => document.getElementById("hero").classList.add("bare"));
-
-const bar = document.getElementById("bar");
-addEventListener("scroll", () => {
-  const h = document.documentElement.scrollHeight - innerHeight;
-  bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-}, { passive:true });
-
-const io = new IntersectionObserver(es => {
-  es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
-}, { threshold:.12 });
-document.querySelectorAll(".rise").forEach(el => io.observe(el));
+const avatar = document.getElementById("avatar");
+const noPhoto = () => document.getElementById("hero").classList.add("no-photo");
+if (!avatar.getAttribute("src")) noPhoto();
+avatar.addEventListener("error", noPhoto);
 
 let tt;
 function toast(m){
@@ -402,23 +1560,22 @@ document.getElementById("btnCopy").addEventListener("click", async () => {
 });
 
 document.getElementById("btnVcard").addEventListener("click", () => {
-  const L = ["BEGIN:VCARD","VERSION:3.0",
-    "N:" + PROFILE.name + ";;;;", "FN:" + PROFILE.name,
-    "ORG:" + PROFILE.org, "TITLE:" + PROFILE.title,
-    "TEL;TYPE=CELL:" + PROFILE.mobile,
-    "TEL;TYPE=WORK:" + PROFILE.tel,
-    "EMAIL;TYPE=INTERNET:" + PROFILE.email,
-    "EMAIL;TYPE=INTERNET:" + PROFILE.email2,
-    "URL:" + PROFILE.website,
-    "ADR;TYPE=WORK:;;" + PROFILE.address + ";;;;",
-    "NOTE:" + PROFILE.tagline + "　LINE ID: " + PROFILE.lineId,
-    "END:VCARD"].join("\r\n");
-  const b = new Blob(["﻿" + L], { type:"text/vcard;charset=utf-8" });
+  const L = ["BEGIN:VCARD","VERSION:3.0","N:" + PROFILE.name + ";;;;","FN:" + PROFILE.name];
+  if (PROFILE.org)   L.push("ORG:" + PROFILE.org);
+  if (PROFILE.title) L.push("TITLE:" + PROFILE.title);
+  if (PROFILE.phone) L.push("TEL;TYPE=CELL:" + PROFILE.phone);
+  if (PROFILE.email) L.push("EMAIL;TYPE=INTERNET:" + PROFILE.email);
+  if (PROFILE.website)   L.push("URL:" + PROFILE.website);
+  if (PROFILE.instagram) L.push("URL;TYPE=Instagram:" + PROFILE.instagram);
+  if (PROFILE.facebook)  L.push("URL;TYPE=Facebook:" + PROFILE.facebook);
+  if (PROFILE.youtube)   L.push("URL;TYPE=YouTube:" + PROFILE.youtube);
+  if (PROFILE.tagline)   L.push("NOTE:" + PROFILE.tagline);
+  L.push("END:VCARD");
+  const b = new Blob(["\\uFEFF" + L.join("\\r\\n")], { type:"text/vcard;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(b);
-  a.download = "Rex-Lee.vcf";
+  a.download = (PROFILE.nameEn || PROFILE.name).replace(/\\s+/g,"-") + ".vcf";
   document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   toast("已下載聯絡人檔");
 });
 
@@ -427,19 +1584,18 @@ function shareMessage(){
   if (CARD_IMAGE_URL) {
     return { type:"flex", altText:PROFILE.name + " 的電子名片", contents:{
       type:"bubble", size:"mega",
-      hero:{ type:"image", url:CARD_IMAGE_URL, size:"full", aspectRatio:"2:3", aspectMode:"cover",
+      hero:{ type:"image", url:CARD_IMAGE_URL, size:"full", aspectRatio:"{{ASPECT}}", aspectMode:"cover",
              action:{ type:"uri", label:"打開名片", uri:url } }
     }};
   }
   return { type:"flex", altText:PROFILE.name + " 的電子名片", contents:{
     type:"bubble",
     body:{ type:"box", layout:"vertical", paddingAll:"18px", contents:[
-      { type:"text", text:PROFILE.name, weight:"bold", size:"xl", color:"#1b1a18" },
-      { type:"text", text:PROFILE.title + " ∙ " + PROFILE.org, size:"sm", color:"#8d8a84", wrap:true, margin:"xs" }
+      { type:"text", text:PROFILE.name, weight:"bold", size:"xl" },
+      { type:"text", text:(PROFILE.title||"") + (PROFILE.org ? " ∙ " + PROFILE.org : ""), size:"sm", color:"#8b94a3", wrap:true, margin:"xs" }
     ]},
     footer:{ type:"box", layout:"vertical", paddingAll:"12px", contents:[
-      { type:"button", style:"primary", height:"sm", color:"#ffad01",
-        action:{ type:"uri", label:"打開電子名片", uri:url } }
+      { type:"button", style:"primary", height:"sm", action:{ type:"uri", label:"打開電子名片", uri:url } }
     ]}
   }};
 }
@@ -457,6 +1613,43 @@ function shareMessage(){
     });
   } catch (e) { console.error("LIFF init failed:", e); }
 })();
+<\/script>
+</body>
+</html>`;
+
+/* ═══════════════════════════════════════════════════════════
+   啟動
+   ═══════════════════════════════════════════════════════════ */
+/* 套用範例資料，並把畫面上的選項同步 */
+function applyDemo(){
+  Object.keys(DEMO).forEach(k => S[k] = DEMO[k]);
+  srcImg = null;
+  FIELDS.forEach(k => { const el = $("f_" + k); if (el) el.value = S[k] || ""; });
+  $("file").value = "";
+  $("cropCtl").hidden = true;
+  $("fullTip").hidden = S.layout === "frame";
+  $("focal").value = S.focal; $("focalVal").textContent = S.focal + "%";
+  [...$("contactMode").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === S.contactMode));
+  [...$("layoutMode").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === S.layout));
+  [...sw.children].forEach((b, i) => b.setAttribute("aria-pressed", PALETTES[i].key === S.palette));
+  $("demoBar").hidden = false;
+  render();
+}
+
+$("btnReset").addEventListener("click", () => {
+  if (!confirm("確定清空重填？目前已填的內容和照片都會消失，回到範例狀態。")) return;
+  try { localStorage.removeItem("namecard"); } catch {}
+  applyDemo();
+});
+
+/* 一動到任何欄位就把「這是範例」的提示收起來 */
+FIELDS.forEach(k => {
+  const el = $("f_" + k);
+  if (el) el.addEventListener("input", () => { $("demoBar").hidden = true; }, { once:true });
+});
+
+if (!load()) applyDemo();   // 沒有存檔（第一次來）就帶入範例
+render();
 </script>
 </body>
 </html>
